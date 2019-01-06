@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Tibia OTS
+Exec=start
+Icon=org.edubart.Otsclient
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Game

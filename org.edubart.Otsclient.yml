@@ -1,0 +1,109 @@
+app-id: org.edubart.Otsclient
+runtime: org.gnome.Platform//3.28
+sdk: org.gnome.Sdk//3.28
+
+tags:
+- proprietary
+
+finish-args:
+- "--share=ipc"
+- "--share=network"
+- "--socket=x11"
+- "--device=dri"
+- "--socket=pulseaudio"
+
+command: "start"
+
+build-options:
+  cflags: -O2 -fstack-protector-strong
+  cxxflags: -O2 -fstack-protector-strong
+  ldflags: -fstack-protector-strong -Wl,-z,relro,-z,now
+  prefix: "/app"
+  libdir: "/app/lib"
+
+modules:
+- "shared-modules/glew/glew.json"
+- "shared-modules/glu/glu-9.0.0.json"
+
+- name: lua
+  config-opts:
+    - --with-compat-module
+  buildsystem: simple
+  build-commands:
+  - make MYCFLAGS="$CFLAGS -fPIC" MYLDFLAGS="$LDFLAGS" linux
+  - make TO_BIN='lua luac' TO_LIB="liblua.a" INSTALL_DATA='cp -d' INSTALL_TOP=/app INSTALL_INC=/app/include/lua install
+  sources:
+  - type: archive
+    url: https://www.lua.org/ftp/lua-5.1.5.tar.gz
+    sha256: 2640fc56a795f29d28ef15e13c34a47e223960b0240e8cb0a82d9b0738695333
+
+- name: boost
+  buildsystem: simple
+  build-commands:
+  - ./bootstrap.sh --prefix=/app --with-libraries=filesystem,thread
+  - ./b2 headers
+  - ./b2 install
+  sources:
+  - sha256: beae2529f759f6b3bf3f4969a19c2e9d6f0c503edcb2de4a61d1428519fcb3b0
+    type: archive
+    url: https://dl.bintray.com/boostorg/release/1.63.0/source/boost_1_63_0.tar.bz2
+
+- name: physfs
+  buildsystem: cmake-ninja
+  config-opts:
+    - -DPHYSFS_BUILD_TEST=off
+  sources:
+    - type: archive
+      url: https://icculus.org/physfs/downloads/physfs-3.0.1.tar.bz2
+      sha256: b77b9f853168d9636a44f75fca372b363106f52d789d18a2f776397bf117f2f1
+
+- name: ots
+  buildsystem: simple
+  build-commands:
+  - mkdir build
+  - cd build && cmake .. -DOpenGL_GL_PREFERENCE=GLVND -DLUA_INCLUDE_DIR=/app/include/lua -DLUA_LIBRARY=/app/lib/liblua.a -DGLEW_INCLUDE_DIR=/app/include/gl -DGLEW_LIBRARY=/app/lib/libGLEW.so -DBOOST_ROOT=/app -DPHYSFS_LIBRARY=/app/lib/libphysfs.so -DPHYSFS_INCLUDE_DIR=/app/include
+  - cd build && make
+  - cp -R . /app/ots
+  sources:
+  - type: git
+    url: https://github.com/edubart/otclient.git
+
+
+#(flatpak 1.0.2)per user installacion cannot be handled by apply_extra
+- name: tibia
+  no-autogen: true
+  buildsystem: simple
+  build-commands:
+  - install -d /app/bin
+  - install -Dm555 start /app/bin
+  sources:
+  - type: script
+    dest-filename: start
+    commands:
+      - 'if [[ ! -f /var/data/ots/build/otclient ]]; then'
+      - '  rm -Rf /var/data/ots'
+      - '  mkdir -p /var/data/ots/build'
+      - '  cp -R /app/ots/build/otclient* /var/data/ots/build'
+      - '  cp -R /app/ots/data /var/data/ots'
+      - '  cp -R /app/ots/mods /var/data/ots'
+      - '  cp -R /app/ots/modules /var/data/ots'
+      - '  cp -R /app/ots/otclientrc.lua /var/data/ots'
+      - '  cp -R /app/ots/init.lua /var/data/ots'
+      - '  chmod 755 /var/data/ots/build/otclient'
+      - 'fi'
+      - 'pwd=/var/data /var/data/ots/build/otclient "$@"'
+
+
+- name: resources
+  no-autogen: true
+  buildsystem: simple
+  build-commands:
+  - install -d /app/share/applications
+  - install -Dm555 org.edubart.Otsclient.desktop /app/share/applications
+  - install -d /app/share/icons/hicolor/256x256/apps/
+  - install -Dm555 org.edubart.Otsclient.png /app/share/icons/hicolor/256x256/apps/
+  sources:
+  - type: file
+    path: org.edubart.Otsclient.desktop
+  - type: file
+    path: org.edubart.Otsclient.png
