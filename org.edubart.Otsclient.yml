@@ -27,7 +27,7 @@ modules:
 
 - name: lua
   config-opts:
-    - --with-compat-module
+  - --with-compat-module
   buildsystem: simple
   build-commands:
   - make MYCFLAGS="$CFLAGS -fPIC" MYLDFLAGS="$LDFLAGS" linux
@@ -51,11 +51,11 @@ modules:
 - name: physfs
   buildsystem: cmake-ninja
   config-opts:
-    - -DPHYSFS_BUILD_TEST=off
+  - -DPHYSFS_BUILD_TEST=off
   sources:
-    - type: archive
-      url: https://icculus.org/physfs/downloads/physfs-3.0.1.tar.bz2
-      sha256: b77b9f853168d9636a44f75fca372b363106f52d789d18a2f776397bf117f2f1
+  - type: archive
+    url: https://icculus.org/physfs/downloads/physfs-3.0.1.tar.bz2
+    sha256: b77b9f853168d9636a44f75fca372b363106f52d789d18a2f776397bf117f2f1
 
 - name: ots
   buildsystem: simple
@@ -68,7 +68,6 @@ modules:
   - type: git
     url: https://github.com/edubart/otclient.git
 
-
 #(flatpak 1.0.2)per user installacion cannot be handled by apply_extra
 - name: tibia
   no-autogen: true
@@ -80,18 +79,18 @@ modules:
   - type: script
     dest-filename: start
     commands:
-      - 'if [[ ! -f /var/data/ots/build/otclient ]]; then'
-      - '  rm -Rf /var/data/ots'
-      - '  mkdir -p /var/data/ots/build'
-      - '  cp -R /app/ots/build/otclient* /var/data/ots/build'
-      - '  cp -R /app/ots/data /var/data/ots'
-      - '  cp -R /app/ots/mods /var/data/ots'
-      - '  cp -R /app/ots/modules /var/data/ots'
-      - '  cp -R /app/ots/otclientrc.lua /var/data/ots'
-      - '  cp -R /app/ots/init.lua /var/data/ots'
-      - '  chmod 755 /var/data/ots/build/otclient'
-      - 'fi'
-      - 'pwd=/var/data /var/data/ots/build/otclient "$@"'
+    - 'if [[ ! -f /var/data/ots/build/otclient ]]; then'
+    - '  rm -Rf /var/data/ots'
+    - '  mkdir -p /var/data/ots/build'
+    - '  cp -R /app/ots/build/otclient* /var/data/ots/build'
+    - '  cp -R /app/ots/data /var/data/ots'
+    - '  cp -R /app/ots/mods /var/data/ots'
+    - '  cp -R /app/ots/modules /var/data/ots'
+    - '  cp -R /app/ots/otclientrc.lua /var/data/ots'
+    - '  cp -R /app/ots/init.lua /var/data/ots'
+    - '  chmod 755 /var/data/ots/build/otclient'
+    - 'fi'
+    - 'pwd=/var/data /var/data/ots/build/otclient "$@"'
 
 
 - name: resources
