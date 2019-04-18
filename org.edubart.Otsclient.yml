@@ -67,6 +67,7 @@ modules:
   sources:
   - type: git
     url: https://github.com/edubart/otclient.git
+    tag: e244ba4775e81a43e7847266638b218869c63627
 
 #(flatpak 1.0.2)per user installacion cannot be handled by apply_extra
 - name: tibia
