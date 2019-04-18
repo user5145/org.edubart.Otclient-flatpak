@@ -71,7 +71,6 @@ modules:
 
 #(flatpak 1.0.2)per user installacion cannot be handled by apply_extra
 - name: tibia
-  no-autogen: true
   buildsystem: simple
   build-commands:
   - install -d /app/bin
@@ -93,9 +92,7 @@ modules:
     - 'fi'
     - 'pwd=/var/data /var/data/ots/build/otclient "$@"'
 
-
 - name: resources
-  no-autogen: true
   buildsystem: simple
   build-commands:
   - install -d /app/share/applications
